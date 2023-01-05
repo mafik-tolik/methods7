@@ -9,7 +9,7 @@ async def hi_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f'/hello\n/help\n/abc\n/candy\n/game\n/calculator')
+    await update.message.reply_text(f'/hello\n/help\n/abc\n/candy\n/game\n/calculator\n/phone_book')
 
 
 async def abc_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -179,4 +179,32 @@ async def calculator_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
             await update.message.reply_text(f'Неверный ввод, возможно пропущен пробел. Попробуйте ещё раз')
 
 
+async def phone_book_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if update.message.text == '/phone_book':
+        await update.message.reply_text(f'Введите команду в формате: /phone_book <export_or_import> <ФИО, телефон, комментарий через запятую (export), либо данные для поиска (import)>')
+    else:
+        
+        if '/phone_book export' in update.message.text:
+            text = update.message.text[19:].split(', ')
+            with open('phone_book.txt', 'a', encoding='utf-8') as file:
+                file.write(f'{", ".join(text)}\n')
+            await update.message.reply_text(f'Сделана запись: {", ".join(text)}')
 
+        elif '/phone_book import' in update.message.text:
+            list1 = []
+            search = update.message.text[19:]
+            with open('phone_book.txt', 'r', encoding='utf-8') as file:
+                list0 = file.read().splitlines()
+                for i in range(len(list0)):
+                    if search in list0[i]:
+                        list1.append(list0[i])
+
+            if len(list1) == 1:
+                await update.message.reply_text(f'Запись по запросу "{search}":\n{list1[0]}')
+
+            elif len(list1) > 1:
+                await update.message.reply_text(f'Записи по запросу "{search}":')
+                for i in range(len(list1)):
+                    await update.message.reply_text(f'{list1[i]}')
+            else:
+                await update.message.reply_text(f'Записи не найдены по запросу "{search}"')

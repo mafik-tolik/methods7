@@ -13,5 +13,7 @@ app.add_handler(CommandHandler('abc', abc_command))
 app.add_handler(CommandHandler('candy', candy_command))
 app.add_handler(CommandHandler('game', game_command))
 app.add_handler(CommandHandler('calculator', calculator_command))
+app.add_handler(CommandHandler('phone_book', phone_book_command))
+
 
 app.run_polling()
