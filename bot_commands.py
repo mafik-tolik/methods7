@@ -1,6 +1,7 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 from random import randint
+from datetime import datetime
 
 
 async def hi_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -109,8 +110,6 @@ async def game_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                 file.write('1')
             await update.message.reply_text('Ход 2-го игрока (нолики)')
             
-            
-
         if motion == '1':
             step = update.message.text.split()[1]
             table[moves[step][0]][moves[step][1]] = '0'
@@ -139,9 +138,45 @@ async def game_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
                         file.write(f'{", ".join(i)}\n')
 
 
+def log_operation(left_operand, right_operand, operation, result):
+    with open('calculator.txt', 'a') as file:
+        oper_time = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        file.write(f'{oper_time} -> {left_operand} {operation} {right_operand} = {result}\n')
+
+
 async def calculator_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.message.text == '/calculator':
-        await update.message.reply_text(f'Введите формулу в формате: /calculator ((3+2)*5-5)/4')
-    else:   
-        text = update.message.text[11:]
-        await update.message.reply_text(f'Результат: {str(eval(text))}')
+        await update.message.reply_text(f'Введите формулу в формате: /calculator <racional_or_complex> <формула (например: 1 + 2)>')
+    else:
+        text = update.message.text.split()
+
+        if len(text) == 5:
+            if '/calculator racional' in update.message.text:
+                a = float(text[2])
+                oper = text[3]
+                b = float(text[4])
+            elif '/calculator complex' in update.message.text:
+                a = complex(text[2])
+                oper = text[3]
+                b = complex(text[4])
+
+            if oper == '+':
+                res = a + b
+
+            elif oper == '-':
+                res = a - b
+
+            elif oper == '/':
+                res = a / b
+
+            elif oper =='*':
+                res = a * b
+
+            await update.message.reply_text(f'Результат: {res}')
+            log_operation(a, b, oper, res)
+        
+        else:
+            await update.message.reply_text(f'Неверный ввод, возможно пропущен пробел. Попробуйте ещё раз')
+
+
+
